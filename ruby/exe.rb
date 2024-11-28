@@ -14,11 +14,9 @@ class User
 end
 
 User.column_names.each do |column_name|
-  User.class_eval <<-METHOD, __FILE__, __LINE__ + 1
-    def update_#{column_name}(value)
-      update(#{column_name}: value)
-    end
-  METHOD
+  User.define_method("update_#{column_name}") do |value|
+    update(column_name => value)
+  end
 end
 
 class ModelReplicaTest < Minitest::Spec
