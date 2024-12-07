@@ -1,5 +1,5 @@
 require 'irb'
-# require 'minitest/autorun'
+require 'minitest/autorun'
 
 
 # ** 目標 **
@@ -30,7 +30,6 @@ module Models
     def mod.available_configs=(val)
       @available_configs = val
     end
-
     mod.available_configs = accessors
 
     accessors.each do |accessor|
@@ -67,3 +66,43 @@ class User
   extend ActiveSupport::Concern
   include Authenticatable
 end
+
+describe 'Authenticatable::ClassMethods' do
+  it 'は、パブリックメソッドに available_configs を持つ' do
+    _(Authenticatable::ClassMethods.public_methods.include?(:available_configs)).must_equal true
+  end
+
+  it 'は、パブリックメソッドに available_configs= を持つ' do
+    _(Authenticatable::ClassMethods.public_methods.include?(:available_configs=)).must_equal true
+  end
+
+  it 'は、インスタンス変数 @available_configs に値を持っている' do
+    _(Authenticatable::ClassMethods.instance_variable_get(:@available_configs)).must_equal %i(case_insensitive_keys)
+  end
+
+
+  it 'は、インスタンスメソッドに case_insensitive_keys を持つ' do
+    _(Authenticatable::ClassMethods.instance_methods.include?(:case_insensitive_keys)).must_equal true
+  end
+
+  it 'は、インスタンスメソッドに case_insensitive_keys= を持つ' do
+    _(Authenticatable::ClassMethods.instance_methods.include?(:case_insensitive_keys=)).must_equal true
+  end
+end
+
+describe 'User' do
+  it "は、Authenticatable::ClassMethodsモジュールがextendされる" do
+    _(User.singleton_class.include?(Authenticatable::ClassMethods)).must_equal true
+  end
+
+
+  it 'は、パブリックメソッドに case_insensitive_keys を持つ' do
+    _(User.public_methods.include?(:case_insensitive_keys)).must_equal true
+  end
+
+  it 'は、パブリックメソッドに case_insensitive_keys= を持つ' do
+    _(User.public_methods.include?(:case_insensitive_keys=)).must_equal true
+  end
+end
+
+# @TODO User.case_insensitive_keys と User.case_insensitive_keys=(val) の動作確認
