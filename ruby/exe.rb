@@ -55,17 +55,21 @@ module Devise
 end
 
 # https://github.com/heartcombo/devise/blob/fec67f98f26fcd9a79072e4581b1bd40d0c7fa1d/lib/devise/models/authenticatable.rb#L220-L223
-module Authenticatable
-  extend ActiveSupport::Concern
+module Devise
+  module Models
+    module Authenticatable
+      extend ActiveSupport::Concern
 
-  module ClassMethods
-    Devise::Models.config(self, :request_keys, :case_insensitive_keys, :hoge)
+      module ClassMethods
+        Devise::Models.config(self, :request_keys, :case_insensitive_keys, :hoge)
+      end
+    end
   end
 end
 
 # https://github.com/heartcombo/devise/blob/fec67f98f26fcd9a79072e4581b1bd40d0c7fa1d/lib/devise/models.rb#L88
 class User
-  include Authenticatable
+  include Devise::Models::Authenticatable
   self.case_insensitive_keys = [:gmail]
 end
 
@@ -75,30 +79,30 @@ end
 
 describe 'Authenticatable::ClassMethods' do
   it 'は、パブリックメソッドに available_configs を持つ' do
-    _(Authenticatable::ClassMethods.public_methods.include?(:available_configs)).must_equal true
+    _(Devise::Models::Authenticatable::ClassMethods.public_methods.include?(:available_configs)).must_equal true
   end
 
   it 'は、パブリックメソッドに available_configs= を持つ' do
-    _(Authenticatable::ClassMethods.public_methods.include?(:available_configs=)).must_equal true
+    _(Devise::Models::Authenticatable::ClassMethods.public_methods.include?(:available_configs=)).must_equal true
   end
 
   it 'は、インスタンス変数 @available_configs に値を持っている' do
-    _(Authenticatable::ClassMethods.instance_variable_get(:@available_configs)).must_equal %i(request_keys case_insensitive_keys hoge)
+    _(Devise::Models::Authenticatable::ClassMethods.instance_variable_get(:@available_configs)).must_equal %i(request_keys case_insensitive_keys hoge)
   end
 
 
   it 'は、インスタンスメソッドに case_insensitive_keys を持つ' do
-    _(Authenticatable::ClassMethods.instance_methods.include?(:case_insensitive_keys)).must_equal true
+    _(Devise::Models::Authenticatable::ClassMethods.instance_methods.include?(:case_insensitive_keys)).must_equal true
   end
 
   it 'は、インスタンスメソッドに case_insensitive_keys= を持つ' do
-    _(Authenticatable::ClassMethods.instance_methods.include?(:case_insensitive_keys=)).must_equal true
+    _(Devise::Models::Authenticatable::ClassMethods.instance_methods.include?(:case_insensitive_keys=)).must_equal true
   end
 end
 
 describe 'User' do
   it "は、Authenticatable::ClassMethodsモジュールがextendされる" do
-    _(User.singleton_class.include?(Authenticatable::ClassMethods)).must_equal true
+    _(User.singleton_class.include?(Devise::Models::Authenticatable::ClassMethods)).must_equal true
   end
 
 
